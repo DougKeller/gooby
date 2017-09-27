@@ -9,3 +9,4 @@ services:
       - ./:/usr/share/hubot
     environment:
       - HUBOT_SLACK_TOKEN
+      - HUBOT_CLEVERBOT_API_KEY
