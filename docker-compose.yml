@@ -1,0 +1,11 @@
+version: '2'
+services:
+  hubot:
+    working_dir: /usr/share/hubot
+    build:
+      context: ./docker
+    command: /setup.sh
+    volumes:
+      - ./:/usr/share/hubot
+    environment:
+      - HUBOT_SLACK_TOKEN
