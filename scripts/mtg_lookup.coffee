@@ -62,7 +62,7 @@ module.exports = (robot) ->
       all_uris = uris.join('\n')
       all_summaries = summaries.join('\n')
 
-      prices_only = /^price/.test request.message.rawText
+      prices_only = /^price/i.test request.message.rawText
       if prices_only
         request.send all_summaries
       else
