@@ -10,24 +10,32 @@
 http = require('../lib/http.js')
 _ = require('underscore')
 
-get_image_uris = (posts, num_images) ->
+subreddits = ['aww', 'rabbits', 'foxes', 'rarepuppers', 'pigs', 'cats', 'batty', 'corgigifs']
+counts = [0, 25, 50, 75]
+
+get_random_subreddit_url = () ->
+  uri = 'https://www.reddit.com/r/'
+  subreddit = _.sample subreddits
+  count = _.sample counts
+  uri += "#{subreddit}/top/.json?sort=top&t=all&count=#{count}"
+  uri
+
+get_image_uri = (posts) ->
   posts = _.reject posts, (post) ->
     post.data.stickied
 
-  posts = _.first posts, num_images
-  _.map posts, (post) ->
-    "https://reddit.com#{post.data.permalink}"
+  post = _.sample posts
+  "https://reddit.com#{post.data.permalink}"
+
 
 module.exports = (robot) ->
-  robot.respond /a(w*)/, (msg) ->
-    uri = 'https://www.reddit.com/r/aww.json'
-    num_images = Math.floor(msg.match[1].length / 2)
-    num_images = 5 if num_images > 5
+  robot.respond /aw{2,}/i, (msg) ->
+    uri = get_random_subreddit_url()
 
     on_success = (response) ->
       posts = response.data.children
-      uris = get_image_uris posts, num_images
-      msg.send uris.join('\n')
+      uri = get_image_uri posts
+      msg.send uri
 
     on_failure = (error) ->
       console.log(error)
