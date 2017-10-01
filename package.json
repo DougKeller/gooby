@@ -11,7 +11,7 @@
     "hubot-google-translate": "^0.2.1",
     "hubot-help": "^0.2.2",
     "hubot-maps": "0.0.3",
-    "hubot-pugme": "^0.1.1",
+    "hubot-pugme": "git+https://github.com/hashashin/hubot-pugme.git",
     "hubot-redis-brain": "0.0.4",
     "hubot-reload-scripts": "^0.1.4",
     "hubot-rules": "^0.1.2",
