@@ -7,19 +7,30 @@ const USERS = 'users';
 
 let valid = {
   'ashley': ['josh', 'matt_damon', 'shane'],
-  'savannah.altman': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'thebeef'],
   'logeybear': ['dkeller', 'josh', 'matt_damon', 'rayoken', 'shane'],
+  'savannah.altman': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'thebeef'],
   'mchrism2': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'shane', 'thebeef'],
   'sonofputin': ['caaaaat', 'dkeller', 'josh', 'matt_damon', 'rayoken', 'shane', 'thebeef'],
+  'mmolexa919': ['sonofputin', 'dkeller', 'caaaaat', 'josh', 'thebeef', 'shane', 'matt_damon'],
+  'mcolclough5': ['sonofputin', 'dkeller', 'caaaaat', 'josh', 'thebeef', 'shane', 'matt_damon'],
   'aekoh3': ['caaaaat', 'dkeller', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'thebeef'],
   'rayoken': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'matt_damon', 'shane', 'sonofputin', 'thebeef'],
   'matt_damon': ['aekoh3', 'ashley', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'rayoken', 'shane', 'sonofputin', 'thebeef'],
-  'dkeller': ['aekoh3', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef'],
-  'caaaaat': ['aekoh3', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef'],
-  'josh': ['ashley', 'caaaaat', 'dkeller', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef'],
-  'thebeef': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin'],
-  'shane': ['aekoh3', 'ashley', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'sonofputin', 'thebeef']
+  'shane': ['aekoh3', 'ashley', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'sonofputin', 'thebeef'],
+  'dkeller': ['aekoh3', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef', 'mmolexa919', 'mcolclough5'],
+  'caaaaat': ['aekoh3', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef', 'mmolexa919', 'mcolclough5'],
+  'josh': ['ashley', 'caaaaat', 'dkeller', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef', 'mmolexa919', 'mcolclough5'],
+  'thebeef': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'mmolexa919', 'mcolclough5']
 }
+
+let couples = [
+  ['ashley', 'thebeef'],
+  ['savannah.altman', 'sonofputin'],
+  ['mchrism2', 'matt_damon'],
+  ['dkeller', 'caaaaat'],
+  ['josh', 'aekoh3'],
+  ['mmolexa919', 'mcolclough5']
+];
 
 let invalid = {};
 _.each(_.keys(valid), (name) => {
@@ -36,10 +47,22 @@ let getMatch = (names, index) => {
 
 let isValid = (santa, match) => santa !== match && _.contains(valid[santa], match);
 
+let santasFor = (match, matches) => {
+  let santas = [];
+
+  _.each(matches, (names, santa) => {
+    if (_.contains(names, match)) {
+      santas.push(santa);
+    }
+  });
+
+  return santas;
+};
+
 let getMatches = () => {
   let names = _.keys(valid);
 
-  let matches = {};
+  let mappings = {};
   let counts = {};
 
   for (var i = 0; i < names.length; i += 1) {
@@ -54,17 +77,54 @@ let getMatches = () => {
       return getMatches();
     }
 
-    let randomNames = _.take(_.shuffle(validNames), numberOfMatches);
-    if (_.some(randomNames, (match) => !isValid(santa, match))) {
+    let matches = _.take(_.shuffle(validNames), numberOfMatches).sort();
+    let bothMatchesAreSameCouple = _.some(couples, (couple) => _.intersection(couple, matches).length === 2);
+    if (bothMatchesAreSameCouple) {
       return getMatches();
     }
 
-    matches[santa] = randomNames.sort();
-    counts = _.countBy(_.flatten(_.values(matches)), _.identity);
+    if (_.some(matches, (match) => !isValid(santa, match))) {
+      return getMatches();
+    }
 
+    mappings[santa] = matches;
+
+    let bothSantasAreSameCouple = (match) => {
+      let santas = santasFor(match, mappings);
+      if (santas.length < 2) {
+        return false;
+      }
+
+      return _.some(couples, (couple) => _.some(couples, (couple) => _.intersection(couple, santas).length === 2));
+    };
+
+    if (_.some(matches, bothSantasAreSameCouple)) {
+      return getMatches();
+    }
+
+    let totalNumberOfCircles = 0;
+    _.each(_.keys(valid), (santa) => {
+      let matches = mappings[santa] || [];
+      _.each(matches, (match) => {
+        let mappingB = mappings[match] || [];
+        if (_.contains(mappingB, santa)) {
+          totalNumberOfCircles += 1;
+        }
+      });
+    });
+
+    if (totalNumberOfCircles > _.keys(valid).length * 0.35) {
+      return getMatches();
+    }
+
+    if (_.all(matches, (match) => _.contains(mappings[match], santa))) {
+      return getMatches();
+    }
+
+    counts = _.countBy(_.flatten(_.values(mappings)), _.identity);
   }
 
-  return matches;
+  return mappings;
 };
 
 let loadUsers = (response) => {
@@ -120,9 +180,7 @@ module.exports = (r) => {
         message += '_Because Amy lives in New York, your gift will need to be shipped to her. Josh will pay for the shipping - just talk to him to get that organized._\n';
       }
 
-      if (santa === 'dkeller') {
-        robot.messageRoom(santaUser.id, 'test');
-      }
+      robot.messageRoom(santaUser.id, message);
     });
   });
 };
