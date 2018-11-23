@@ -159,28 +159,28 @@ module.exports = (r) => {
 
   loadUsers();
 
-  robot.hear(/secret santa send/i, (res) => {
-    let matches = getMatches();
+  // robot.hear(/secret santa send/i, (res) => {
+  //   let matches = getMatches();
 
-    _.each(matches, (matches, santa) => {
-      let santaUser = userFor(santa);
-      let matchUsers = _.map(matches, (match) => userFor(match));
+  //   _.each(matches, (matches, santa) => {
+  //     let santaUser = userFor(santa);
+  //     let matchUsers = _.map(matches, (match) => userFor(match));
 
-      let message = '';
-      message += `:christmas_tree::santa::christmas_tree: THIS IS THE REAL ONE!!!! IGNORE THE OTHERS :christmas_tree::santa::christmas_tree:\n\n`;
+  //     let message = '';
+  //     message += `:christmas_tree::santa::christmas_tree: THIS IS THE REAL ONE!!!! IGNORE THE OTHERS :christmas_tree::santa::christmas_tree:\n\n`;
 
-      let santaName = santa === 'ashley' ? 'Ashley' : santaUser.name;
-      let matchNames = _.map(matches, (match, index) => match === 'ashley' ? '*Ashley*' : `*${matchUsers[index].name}*`);
-      message += `*${santaName}*, you are ${matchNames.join(' and ')}'s secret santa!\n`;
-      message += 'Gifts should be around *$25* each.\n';
+  //     let santaName = santa === 'ashley' ? 'Ashley' : santaUser.name;
+  //     let matchNames = _.map(matches, (match, index) => match === 'ashley' ? '*Ashley*' : `*${matchUsers[index].name}*`);
+  //     message += `*${santaName}*, you are ${matchNames.join(' and ')}'s secret santa!\n`;
+  //     message += 'Gifts should be around *$25* each.\n';
 
-      message += 'A date hasn\'t been decided yet, but we will probably exchange gifts around the 15th. So try to have your gift ready by then!\n\n';
+  //     message += 'A date hasn\'t been decided yet, but we will probably exchange gifts around the 15th. So try to have your gift ready by then!\n\n';
 
-      if (_.contains(matches, 'aekoh3')) {
-        message += '_Because Amy lives in New York, your gift will need to be shipped to her. Josh will pay for the shipping - just talk to him to get that organized._\n';
-      }
+  //     if (_.contains(matches, 'aekoh3')) {
+  //       message += '_Because Amy lives in New York, your gift will need to be shipped to her. Josh will pay for the shipping - just talk to him to get that organized._\n';
+  //     }
 
-      robot.messageRoom(santaUser.id, message);
-    });
-  });
+  //     robot.messageRoom(santaUser.id, message);
+  //   });
+  // });
 };
