@@ -10,3 +10,19 @@ services:
     environment:
       - HUBOT_SLACK_TOKEN
       - HUBOT_CLEVERBOT_API_KEY
+      - REDIS_URL
+  hubot_redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    labels:
+      kompose.service.type: nodeport
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis_data:/bitnami/redis'
+
+volumes:
+  redis_data:
+    driver: local
