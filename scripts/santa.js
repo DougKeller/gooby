@@ -167,7 +167,7 @@ module.exports = (r) => {
       let matchUsers = _.map(matches, (match) => userFor(match));
 
       let message = '';
-      message += `:christmas_tree::santa::christmas_tree: Secret Santa 2k18 :christmas_tree::santa::christmas_tree:\n\n`;
+      message += `:christmas_tree::santa::christmas_tree: THIS IS THE REAL ONE!!!! IGNORE THE OTHERS :christmas_tree::santa::christmas_tree:\n\n`;
 
       let santaName = santa === 'ashley' ? 'Ashley' : santaUser.name;
       let matchNames = _.map(matches, (match, index) => match === 'ashley' ? '*Ashley*' : `*${matchUsers[index].name}*`);
