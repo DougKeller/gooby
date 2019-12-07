@@ -73,10 +73,15 @@ let getMatches = () => {
     });
 
     if (validNames.length < MATCHES_PER_SANTA) {
+      console.log('not enough valid matches');
       return getMatches();
     }
 
     let matches = _.take(_.shuffle(validNames), MATCHES_PER_SANTA).sort();
+    if (_.some(matches, (match) => !isValid(santa, match))) {
+      console.log('invalid match');
+      return getMatches();
+    }
     mappings[santa] = matches;
 
     let totalNumberOfCircles = 0;
@@ -91,15 +96,19 @@ let getMatches = () => {
     });
 
     if (totalNumberOfCircles > PARTICIPANTS.length * 0.35) {
+      console.log('circles');
       return getMatches();
     }
 
     if (_.all(matches, (match) => _.contains(mappings[match], santa))) {
+      console.log('contains self')
       return getMatches();
     }
 
     counts = _.countBy(_.flatten(_.values(mappings)), _.identity);
   }
+
+  console.log(counts);
 
   return mappings;
 };
