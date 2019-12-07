@@ -17,6 +17,7 @@ const PARTICIPANTS = [
   'jakethompy',
   'a.mcknight1810'
 ];
+const MATCHES_PER_SANTA = 2;
 
 let couples = [
   ['a.mcknight1810', 'thebeef'],
@@ -34,7 +35,18 @@ let getMatch = (names, index) => {
   return names[index];
 };
 
-let isValid = (santa, match) => santa !== match;
+let isValid = (santa, match) => {
+  if (santa === match) {
+    return false;
+  }
+
+  let isSameCouple = _.some(couples, c => _.contains(c, santa) && _.contains(c, match));
+  if (isSameCouple) {
+    return false;
+  }
+
+  return true;
+};
 
 let santasFor = (match, matches) => {
   let santas = [];
@@ -56,38 +68,16 @@ let getMatches = () => {
     let santa = PARTICIPANTS[i];
 
     let currentMatches = [];
-    let numberOfMatches = 2;
-    let validNames = _.select(PARTICIPANTS, (match) => isValid(santa, match));
-    validNames = _.reject(validNames, (match) => counts[match] >= numberOfMatches);
+    let validNames = _.select(PARTICIPANTS, (match) => {
+      return isValid(santa, match) && counts[match] < MATCHES_PER_SANTA;
+    });
 
-    if (validNames.length < numberOfMatches) {
+    if (validNames.length < MATCHES_PER_SANTA) {
       return getMatches();
     }
 
-    let matches = _.take(_.shuffle(validNames), numberOfMatches).sort();
-    let bothMatchesAreSameCouple = _.some(couples, (couple) => _.intersection(couple, matches).length === 2);
-    if (bothMatchesAreSameCouple) {
-      return getMatches();
-    }
-
-    if (_.some(matches, (match) => !isValid(santa, match))) {
-      return getMatches();
-    }
-
+    let matches = _.take(_.shuffle(validNames), MATCHES_PER_SANTA).sort();
     mappings[santa] = matches;
-
-    let bothSantasAreSameCouple = (match) => {
-      let santas = santasFor(match, mappings);
-      if (santas.length < 2) {
-        return false;
-      }
-
-      return _.some(couples, (couple) => _.some(couples, (couple) => _.intersection(couple, santas).length === 2));
-    };
-
-    if (_.some(matches, bothSantasAreSameCouple)) {
-      return getMatches();
-    }
 
     let totalNumberOfCircles = 0;
     _.each(PARTICIPANTS, (santa) => {
