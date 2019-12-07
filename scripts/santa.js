@@ -90,28 +90,28 @@ let getMatches = () => {
       });
 
       if (validNames.length < MATCHES_PER_SANTA) {
-        continue;
+        return getMatches();
       }
 
       let matches = _.take(_.shuffle(validNames), MATCHES_PER_SANTA).sort();
 
       let matchesAreSameCouple = significantOthers[matches[0]] === matches[1];
       if (matchesAreSameCouple) {
-        continue;
+        return getMatches();
       }
 
       mappings[santa] = matches;
 
       let allMatchesAreAlsoGiftingSanta = _.all(matches, (match) => _.contains(mappings[match], santa));
       if (allMatchesAreAlsoGiftingSanta) {
-        continue;
+        return getMatches();
       }
 
       counts = _.countBy(_.flatten(_.values(mappings)), _.identity);
     }
 
     if (getTotalCyclicalMatches(mappings) > PARTICIPANTS.length * 0.35) {
-      continue;
+      return getMatches();
     }
 
     console.log(counts);
