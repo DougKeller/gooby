@@ -80,42 +80,44 @@ let getTotalCyclicalMatches = (mappings) => {
 };
 
 let getMatches = () => {
-  let mappings = {};
-  let counts = {};
+  while (true) {
+    let mappings = {};
+    let counts = {};
 
-  for (santa in PARTICIPANTS) {
-    let validNames = _.select(PARTICIPANTS, (match) => {
-      return isValid(santa, match) && (counts[match] || 0) < MATCHES_PER_SANTA;
-    });
+    for (santa in PARTICIPANTS) {
+      let validNames = _.select(PARTICIPANTS, (match) => {
+        return isValid(santa, match) && (counts[match] || 0) < MATCHES_PER_SANTA;
+      });
 
-    if (validNames.length < MATCHES_PER_SANTA) {
-      return getMatches();
+      if (validNames.length < MATCHES_PER_SANTA) {
+        continue;
+      }
+
+      let matches = _.take(_.shuffle(validNames), MATCHES_PER_SANTA).sort();
+
+      let matchesAreSameCouple = significantOthers[matches[0]] === matches[1];
+      if (matchesAreSameCouple) {
+        continue;
+      }
+
+      mappings[santa] = matches;
+
+      let allMatchesAreAlsoGiftingSanta = _.all(matches, (match) => _.contains(mappings[match], santa));
+      if (allMatchesAreAlsoGiftingSanta) {
+        continue;
+      }
+
+      counts = _.countBy(_.flatten(_.values(mappings)), _.identity);
     }
 
-    let matches = _.take(_.shuffle(validNames), MATCHES_PER_SANTA).sort();
-
-    let matchesAreSameCouple = significantOthers[matches[0]] === matches[1];
-    if (matchesAreSameCouple) {
-      return getMatches();
+    if (getTotalCyclicalMatches(mappings) > PARTICIPANTS.length * 0.35) {
+      continue;
     }
 
-    mappings[santa] = matches;
+    console.log(counts);
 
-    let allMatchesAreAlsoGiftingSanta = _.all(matches, (match) => _.contains(mappings[match], santa));
-    if (allMatchesAreAlsoGiftingSanta) {
-      return getMatches();
-    }
-
-    counts = _.countBy(_.flatten(_.values(mappings)), _.identity);
+    return mappings;
   }
-
-  if (getTotalCyclicalMatches(mappings) > PARTICIPANTS.length * 0.35) {
-    return getMatches();
-  }
-
-  console.log(counts);
-
-  return mappings;
 };
 
 let loadUsers = (response) => {
