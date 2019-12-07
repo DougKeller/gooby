@@ -84,7 +84,9 @@ let getMatches = () => {
     let mappings = {};
     let counts = {};
 
-    for (santa in PARTICIPANTS) {
+    for (i in PARTICIPANTS) {
+      let santa = PARTICIPANTS[i];
+
       let validNames = _.select(PARTICIPANTS, (match) => {
         return isValid(santa, match) && (counts[match] || 0) < MATCHES_PER_SANTA;
       });
