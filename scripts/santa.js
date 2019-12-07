@@ -57,7 +57,7 @@ let getMatches = () => {
 
     let currentMatches = [];
     let numberOfMatches = 2;
-    let validNames = valid[santa];
+    let validNames = _.select(PARTICIPANTS, (match) => isValid(santa, match));
     validNames = _.reject(validNames, (match) => counts[match] >= numberOfMatches);
 
     if (validNames.length < numberOfMatches) {
@@ -90,7 +90,7 @@ let getMatches = () => {
     }
 
     let totalNumberOfCircles = 0;
-    _.each(_.keys(valid), (santa) => {
+    _.each(PARTICIPANTS, (santa) => {
       let matches = mappings[santa] || [];
       _.each(matches, (match) => {
         let mappingB = mappings[match] || [];
@@ -100,7 +100,7 @@ let getMatches = () => {
       });
     });
 
-    if (totalNumberOfCircles > _.keys(valid).length * 0.35) {
+    if (totalNumberOfCircles > PARTICIPANTS.length * 0.35) {
       return getMatches();
     }
 
