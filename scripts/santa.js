@@ -83,7 +83,7 @@ let getMatches = () => {
   let mappings = {};
   let counts = {};
 
-  _.each(PARTICIPANTS, (santa) => {
+  for (santa in PARTICIPANTS) {
     let validNames = _.select(PARTICIPANTS, (match) => {
       return isValid(santa, match) && (counts[match] || 0) < MATCHES_PER_SANTA;
     });
@@ -93,6 +93,12 @@ let getMatches = () => {
     }
 
     let matches = _.take(_.shuffle(validNames), MATCHES_PER_SANTA).sort();
+
+    let matchesAreSameCouple = significantOthers[matches[0]] === matches[1];
+    if (matchesAreSameCouple) {
+      return getMatches();
+    }
+
     mappings[santa] = matches;
 
     let allMatchesAreAlsoGiftingSanta = _.all(matches, (match) => _.contains(mappings[match], santa));
@@ -101,7 +107,7 @@ let getMatches = () => {
     }
 
     counts = _.countBy(_.flatten(_.values(mappings)), _.identity);
-  });
+  }
 
   if (getTotalCyclicalMatches(mappings) > PARTICIPANTS.length * 0.35) {
     return getMatches();
