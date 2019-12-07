@@ -60,9 +60,16 @@ let santasFor = (match, matches) => {
   return santas;
 };
 
+let attempts = 0;
+
 let getMatches = () => {
+  attempts += 1;
   let mappings = {};
   let counts = {};
+
+  if (attempts > 500) {
+    throw 'giving up';
+  }
 
   for (var i = 0; i < PARTICIPANTS.length; i += 1) {
     let santa = PARTICIPANTS[i];
@@ -71,6 +78,8 @@ let getMatches = () => {
     let validNames = _.select(PARTICIPANTS, (match) => {
       return isValid(santa, match) && counts[match] < MATCHES_PER_SANTA;
     });
+
+    console.log(santa, validNames);
 
     if (validNames.length < MATCHES_PER_SANTA) {
       console.log('not enough valid matches');
