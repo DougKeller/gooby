@@ -26,6 +26,11 @@ let couples = [
   ['josh', 'aekoh3'],
   ['mmolexa919', 'mcolclough5']
 ];
+let significantOthers = {};
+_.each(couples, (couple) => {
+  significantOthers[couple[0]] = couple[1];
+  significantOthers[couple[1]] = couple[0];
+});
 
 let getMatch = (names, index) => {
   if (index >= names.length) {
@@ -40,7 +45,7 @@ let isValid = (santa, match) => {
     return false;
   }
 
-  let isSameCouple = _.some(couples, c => _.contains(c, santa) && _.contains(c, match));
+  let isSameCouple = significantOthers[santa] === match;
   if (isSameCouple) {
     return false;
   }
@@ -71,10 +76,7 @@ let getMatches = () => {
     throw 'giving up';
   }
 
-  for (var i = 0; i < PARTICIPANTS.length; i += 1) {
-    let santa = PARTICIPANTS[i];
-
-    let currentMatches = [];
+  _.each(PARTICIPANTS, (santa) => {
     let validNames = _.select(PARTICIPANTS, (match) => {
       return isValid(santa, match) && counts[match] < MATCHES_PER_SANTA;
     });
@@ -115,7 +117,7 @@ let getMatches = () => {
     }
 
     counts = _.countBy(_.flatten(_.values(mappings)), _.identity);
-  }
+  });
 
   console.log(counts);
 
