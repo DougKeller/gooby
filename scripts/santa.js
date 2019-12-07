@@ -78,7 +78,7 @@ let getMatches = () => {
 
   _.each(PARTICIPANTS, (santa) => {
     let validNames = _.select(PARTICIPANTS, (match) => {
-      return isValid(santa, match) && counts[match] < MATCHES_PER_SANTA;
+      return isValid(santa, match) && (counts[match] || 0) < MATCHES_PER_SANTA;
     });
 
     console.log(santa, validNames);
