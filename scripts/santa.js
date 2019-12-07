@@ -116,8 +116,6 @@ let getMatches = () => {
       return getMatches();
     }
 
-    console.log(counts);
-
     return mappings;
   }
 };
@@ -158,23 +156,24 @@ module.exports = (r) => {
 
   robot.respond(/secret santa send/i, (res) => {
     let matches = getMatches();
-    console.log(matches);
 
-    // _.each(matches, (matches, santa) => {
-    //   let santaUser = userFor(santa);
-    //   let matchUsers = _.map(matches, (match) => userFor(match));
+    _.each(matches, (matches, santa) => {
+      let santaUser = userFor(santa);
+      let matchUsers = _.map(matches, (match) => userFor(match));
 
-    //   let message = '';
-    //   message += `:christmas_tree::santa::christmas_tree: Secret Santa 2019 :christmas_tree::santa::christmas_tree:\n\n`;
+      let message = '';
+      message += `:christmas_tree::santa::christmas_tree: Secret Santa 2019 :christmas_tree::santa::christmas_tree:\n\n`;
 
-    //   let santaName = santaUser.name;
-    //   let matchNames = _.map(matches, (match, index) => `*${matchUsers[index].name}*`);
-    //   message += `*${santaName}*, you are ${matchNames.join(' and ')}'s secret santa!\n`;
-    //   message += 'Gifts should be around *$25* each.\n';
+      let santaName = santaUser.name;
+      let matchNames = _.map(matches, (match, index) => `*${matchUsers[index].name}*`);
+      message += `*${santaName}*, you are ${matchNames.join(' and ')}'s secret santa!\n`;
+      message += 'Gifts should be around *$25* each.\n';
 
-    //   message += 'We will probably exchange gifts around the 20th. So try to have your gift ready by then!\n\n';
+      message += 'We will probably exchange gifts around the 20th. So try to have your gift ready by then!\n\n';
 
-    //   robot.messageRoom(santaUser.id, message);
-    // });
+      console.log('messaging ' + santaUser.id + ' (' + santaUser.name + ')');
+      console.log(message);
+      // robot.messageRoom(santaUser.id, message);
+    });
   });
 };
