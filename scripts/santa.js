@@ -171,7 +171,7 @@ module.exports = (r) => {
 
       message += 'We will probably exchange gifts around the 20th. So try to have your gift ready by then!\n\n';
 
-      robot.messageRoom(santaUser.id, message);
+      // robot.messageRoom(santaUser.id, message);
     });
   });
 };
