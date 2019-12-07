@@ -5,37 +5,26 @@ let robot;
 
 const USERS = 'users';
 
-let valid = {
-  'ashley': ['josh', 'matt_damon', 'shane'],
-  'logeybear': ['dkeller', 'josh', 'matt_damon', 'rayoken', 'shane'],
-  'savannah.altman': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'thebeef'],
-  'mchrism2': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'shane', 'thebeef'],
-  'sonofputin': ['caaaaat', 'dkeller', 'josh', 'matt_damon', 'rayoken', 'shane', 'thebeef'],
-  'mmolexa919': ['sonofputin', 'dkeller', 'caaaaat', 'josh', 'thebeef', 'shane', 'matt_damon'],
-  'mcolclough5': ['sonofputin', 'dkeller', 'caaaaat', 'josh', 'thebeef', 'shane', 'matt_damon'],
-  'aekoh3': ['caaaaat', 'dkeller', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'thebeef'],
-  'rayoken': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'matt_damon', 'shane', 'sonofputin', 'thebeef'],
-  'matt_damon': ['aekoh3', 'ashley', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'rayoken', 'shane', 'sonofputin', 'thebeef'],
-  'shane': ['aekoh3', 'ashley', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'sonofputin', 'thebeef'],
-  'dkeller': ['aekoh3', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef', 'mmolexa919', 'mcolclough5'],
-  'caaaaat': ['aekoh3', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef', 'mmolexa919', 'mcolclough5'],
-  'josh': ['ashley', 'caaaaat', 'dkeller', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'thebeef', 'mmolexa919', 'mcolclough5'],
-  'thebeef': ['aekoh3', 'caaaaat', 'dkeller', 'josh', 'logeybear', 'matt_damon', 'mchrism2', 'rayoken', 'savannah.altman', 'shane', 'sonofputin', 'mmolexa919', 'mcolclough5']
-}
+const PARTICIPANTS = [
+  'dkeller',
+  'josh',
+  'matt_damon',
+  'caaaaat',
+  'thebeef',
+  'rayoken',
+  'logeybear',
+  'aekoh3',
+  'jakethompy',
+  'a.mcknight1810'
+];
 
 let couples = [
-  ['ashley', 'thebeef'],
+  ['a.mcknight1810', 'thebeef'],
   ['savannah.altman', 'sonofputin'],
-  ['mchrism2', 'matt_damon'],
   ['dkeller', 'caaaaat'],
   ['josh', 'aekoh3'],
   ['mmolexa919', 'mcolclough5']
 ];
-
-let invalid = {};
-_.each(_.keys(valid), (name) => {
-  invalid[name] = _.without(_.keys(valid), name, ...valid[name]).sort();;
-});
 
 let getMatch = (names, index) => {
   if (index >= names.length) {
@@ -45,7 +34,7 @@ let getMatch = (names, index) => {
   return names[index];
 };
 
-let isValid = (santa, match) => santa !== match && _.contains(valid[santa], match);
+let isValid = (santa, match) => santa !== match;
 
 let santasFor = (match, matches) => {
   let santas = [];
@@ -60,13 +49,11 @@ let santasFor = (match, matches) => {
 };
 
 let getMatches = () => {
-  let names = _.keys(valid);
-
   let mappings = {};
   let counts = {};
 
-  for (var i = 0; i < names.length; i += 1) {
-    let santa = names[i];
+  for (var i = 0; i < PARTICIPANTS.length; i += 1) {
+    let santa = PARTICIPANTS[i];
 
     let currentMatches = [];
     let numberOfMatches = 2;
@@ -142,15 +129,17 @@ let loadUsers = (response) => {
       };
     });
 
+    PARTICIPANTS.forEach((participant) => {
+      if (!_.some(users, u => u.username === participant)) {
+        throw `Invalid user: ${participant}`;
+      }
+    });
+
     robot.brain.set(USERS, users);
   }, () => console.log('Failed to fetch users.'));
 };
 
 let userFor = (username) => {
-  if (username === 'ashley') {
-    return userFor('thebeef');
-  }
-
   return _.find(robot.brain.get(USERS), (user) => user.username === username);
 };
 
@@ -159,28 +148,25 @@ module.exports = (r) => {
 
   loadUsers();
 
-  // robot.hear(/secret santa send/i, (res) => {
-  //   let matches = getMatches();
+  robot.respond(/secret santa send/i, (res) => {
+    let matches = getMatches();
+    console.log(matches);
 
-  //   _.each(matches, (matches, santa) => {
-  //     let santaUser = userFor(santa);
-  //     let matchUsers = _.map(matches, (match) => userFor(match));
+    // _.each(matches, (matches, santa) => {
+    //   let santaUser = userFor(santa);
+    //   let matchUsers = _.map(matches, (match) => userFor(match));
 
-  //     let message = '';
-  //     message += `:christmas_tree::santa::christmas_tree: THIS IS THE REAL ONE!!!! IGNORE THE OTHERS :christmas_tree::santa::christmas_tree:\n\n`;
+    //   let message = '';
+    //   message += `:christmas_tree::santa::christmas_tree: Secret Santa 2019 :christmas_tree::santa::christmas_tree:\n\n`;
 
-  //     let santaName = santa === 'ashley' ? 'Ashley' : santaUser.name;
-  //     let matchNames = _.map(matches, (match, index) => match === 'ashley' ? '*Ashley*' : `*${matchUsers[index].name}*`);
-  //     message += `*${santaName}*, you are ${matchNames.join(' and ')}'s secret santa!\n`;
-  //     message += 'Gifts should be around *$25* each.\n';
+    //   let santaName = santaUser.name;
+    //   let matchNames = _.map(matches, (match, index) => `*${matchUsers[index].name}*`);
+    //   message += `*${santaName}*, you are ${matchNames.join(' and ')}'s secret santa!\n`;
+    //   message += 'Gifts should be around *$25* each.\n';
 
-  //     message += 'A date hasn\'t been decided yet, but we will probably exchange gifts around the 15th. So try to have your gift ready by then!\n\n';
+    //   message += 'We will probably exchange gifts around the 20th. So try to have your gift ready by then!\n\n';
 
-  //     if (_.contains(matches, 'aekoh3')) {
-  //       message += '_Because Amy lives in New York, your gift will need to be shipped to her. Josh will pay for the shipping - just talk to him to get that organized._\n';
-  //     }
-
-  //     robot.messageRoom(santaUser.id, message);
-  //   });
-  // });
+    //   robot.messageRoom(santaUser.id, message);
+    // });
+  });
 };
