@@ -67,12 +67,15 @@ let santasFor = (match, matches) => {
 
 let getTotalCyclicalMatches = (mappings) => {
   let totalNumberOfCircles = 0;
-  _.each(PARTICIPANTS, (santa) => {
-    let matches = mappings[santa];
-    if (_.some(matches, match => _.contains(mappings[match], santa))) {
-      totalNumberOfCircles += 1;
-    }
+
+  _.each(mappings, (matches, santa) => {
+    _.each(matches, (match) => {
+      if (_.contains(mappings[match] || [], santa)) {
+        totalNumberOfCircles += 1;
+      }
+    });
   });
+
   return totalNumberOfCircles;
 };
 
@@ -92,10 +95,6 @@ let getMatches = () => {
     let matches = _.take(_.shuffle(validNames), MATCHES_PER_SANTA).sort();
     mappings[santa] = matches;
 
-    if (getTotalCyclicalMatches(mappings) > PARTICIPANTS.length * 0.35) {
-      return getMatches();
-    }
-
     let allMatchesAreAlsoGiftingSanta = _.all(matches, (match) => _.contains(mappings[match], santa));
     if (allMatchesAreAlsoGiftingSanta) {
       return getMatches();
@@ -103,6 +102,12 @@ let getMatches = () => {
 
     counts = _.countBy(_.flatten(_.values(mappings)), _.identity);
   });
+
+  if (getTotalCyclicalMatches(mappings) > PARTICIPANTS.length * 0.35) {
+    return getMatches();
+  }
+
+  console.log(counts);
 
   return mappings;
 };
